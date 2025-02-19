@@ -1,16 +1,7 @@
-console.log("[Caller's Box Term Changer] Running")
+// This script relies on maps.js loading first
+// and populating the global namespace
 
-const TERMS = new Map([
-    ['ROLE_R', 'Robins'],
-    ['ROLE_L', 'Larks'],
-    ['CHAIN_R', 'Robins chain'],
-    ['CHAIN_L', 'Larks chain'],
-    ['RSR', 'right shoulder round'],
-    ['LSR', 'left shoulder round'],
-    // Single initials for micro-notation, such as in hey or waves descriptions
-    ['MICRO_R', 'R'],
-    ['MICRO_L', 'L'],
-])
+console.log("[Caller's Box Term Changer] Running")
 
 const getDescendentTextNodes = el => {
     const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null, false)
@@ -19,6 +10,12 @@ const getDescendentTextNodes = el => {
         nodes.push(walker.currentNode)
     }
     return nodes
+}
+
+const getFormationCell = () => {
+    return Array.from(document.querySelectorAll('td'))
+        .find(cell => cell.textContent.includes('FormationDetail'))
+        ?.nextElementSibling
 }
 
 const replaceTerm = (key) => (el) => el.textContent = TERMS.get(key)
@@ -31,10 +28,24 @@ const replaceRoles = () => {
 }
 
 const replaceChains = () => {
+    // Turns out there's a lot of kinds of chains
+    // and they all have role terms in them!
     document.querySelectorAll('a[href$="#ladies-chain"]')
         .forEach(replaceTerm('CHAIN_R'))
     document.querySelectorAll('a[href$="#gents-chain"]')
         .forEach(replaceTerm('CHAIN_L'))
+    document.querySelectorAll('a[href$="#right-hand-ladies-chain"]')
+        .forEach(replaceTerm('CHAIN_R_BY_L'))
+    document.querySelectorAll('a[href$="#grand-ladies-chain"]')
+        .forEach(replaceTerm('GRAND_CHAIN_R'))
+    document.querySelectorAll('a[href$="#grand-gents-chain"]')
+        .forEach(replaceTerm('GRAND_CHAIN_L'))
+    document.querySelectorAll('a[href$="#open-ladies-chain"]')
+        .forEach(replaceTerm('OPEN_CHAIN_R'))
+    document.querySelectorAll('a[href$="#open-gents-chain"]')
+        .forEach(replaceTerm('OPEN_CHAIN_L'))
+    document.querySelectorAll('a[href$="#three-ladies-chain"]')
+        .forEach(replaceTerm('THREE_CHAIN_R'))
 }
 
 const replaceShoulderRounds = () => {
@@ -56,6 +67,11 @@ const replaceShoulderRounds = () => {
         const term = direction === 'right' ? 'RSR' : 'LSR'
         element.textContent = TERMS.get(term)
     })
+}
+
+const replaceDoubleGyp = () => {
+    document.querySelectorAll('a[href$="#double-gyp"]')
+        .forEach(replaceTerm('DOUBLE_TRADE'))
 }
 
 const replaceMicroNotationChoreo = () => {
@@ -84,13 +100,10 @@ const replaceMicroNotationFormation = () => {
     // We also need to replace the micro notation in Formation Detail table
     // for cases like "Wave of four (NR, WL)." Unfortunately there's no CSS
     // selector for this task.
+    const formationDetailValCell = getFormationCell()
 
-    const formationDetailKeyCell = Array.from(document.querySelectorAll('td'))
-        .find(cell => cell.textContent.includes('FormationDetail'))
+    if (!formationDetailValCell) return
 
-    if (!formationDetailKeyCell) return
-
-    const formationDetailValCell = formationDetailKeyCell.nextElementSibling
     formationTextNodes = getDescendentTextNodes(formationDetailValCell)
     formationTextNodes.forEach(node => {
         node.textContent = node.textContent
@@ -105,6 +118,7 @@ const replaceAll = () => {
     replaceRoles()
     replaceChains()
     replaceShoulderRounds()
+    replaceDoubleGyp()
     replaceMicroNotationChoreo()
     replaceMicroNotationFormation()
 }
