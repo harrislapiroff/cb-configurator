@@ -1,0 +1,12 @@
+{
+    "manifest_version":2,
+    "version":"1.0",
+    "name":"Caller's Box Term Changer",
+    "content_scripts": [
+        {
+            "matches": ["*://*.ibiblio.org/contradance/thecallersbox/dance.php?id=*"],
+            "js": ["main.js"],
+            "run_at": "document_end"
+        }
+    ]
+}
