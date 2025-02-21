@@ -9,22 +9,6 @@ const HALF_GYP_TERMS = new Map([
 	['DOUBLE_TRADE', 'quick trades'],
 ])
 
-const ROLE_TERMS_LG = new Map([
-	['ROLE_R', 'Ladies'],
-	['ROLE_L', 'Gents'],
-	['CHAIN_R', 'Ladies chain'],
-	['CHAIN_L', 'Gents chain'],
-	['CHAIN_R_BY_L', 'right-hand chain'],
-	['GRAND_CHAIN_R', 'Ladies grand chain'],
-	['GRAND_CHAIN_L', 'Gents grand chain'],
-	['OPEN_CHAIN_R', 'Ladies open chain'],
-	['OPEN_CHAIN_L', 'Gents open chain'],
-	['THREE_CHAIN_R', 'Three ladies chain'],
-	// Single initials for micro-notation, such as in hey or waves descriptions
-	['MICRO_R', 'L'],
-	['MICRO_L', 'G'],
-])
-
 const ROLE_TERMS_BIRDS = new Map([
 	['ROLE_R', 'Robins'],
 	['ROLE_L', 'Larks'],

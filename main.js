@@ -160,7 +160,6 @@ const init = async () => {
 		if (options.useRSR) termMaps.push(RSR_TERMS)
 		if (options.useRSR) termMaps.push(HALF_GYP_TERMS)
 		if (options.roleTerms === 'birds') termMaps.push(ROLE_TERMS_BIRDS)
-		if (options.roleTerms === 'lg') termMaps.push(ROLE_TERMS_LG)
 		if (options.roleTerms === 'lf') termMaps.push(ROLE_TERMS_LF)
 
 		const terms = new Map([...termMaps.map(map => [...map])].flat())
