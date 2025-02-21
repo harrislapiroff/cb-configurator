@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Caller's Box Term Changer Options</title>
+	<meta name="color-scheme" content="dark light" />
+	<style>
+		:root {
+			font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, Cantarell, Ubuntu, roboto, noto, helvetica, arial, sans-serif;
+			margin: 0;
+			padding: 0;
+			font-size: 0.9em;
+		}
+		body {
+			margin: 0;
+			padding: 0;
+		}
+		h1 {
+			font-size: inherit;
+			font-weight: bold;
+			margin: 0;
+			padding: 0.5em 1ch;
+		}
+		.form-row {
+			padding: 0.5em 1ch;
+			border-top: 1px solid rgba(0,0,0,0.25);
+		}
+		@media (prefers-color-scheme: dark) {
+			.form-row {
+				border-color: rgba(255,255,255,0.25)
+			}
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<h1>Caller's Box Configurator</h1>
+		<cb-options-form>
+			<form>
+				<section class="form-row">
+					<label>
+						<input type="checkbox" name="enabled"> Enabled
+					</label>
+				</section>
+
+				<section class="form-row">
+					<label title="Replace “gypsy” with “right shoulder round”">
+						<input type="checkbox" name="useRSR"> Use "right shoulder round"
+					</label>
+				</section>
+
+				<section class="form-row">
+					<label for="roleTerms">Role Terms:</label>
+					<select name="roleTerms">
+						<option value="birds">Larks/Robins</option>
+						<option value="lf">Lead/Follow</option>
+						<option value="lg">Ladies/Gents</option>
+						<option value="mw">Men/Women (no change)</option>
+					</select>
+				</section>
+			</form>
+		</cb-options-form>
+	</div>
+	<script src="options.js"></script>
+</body>
+</html>

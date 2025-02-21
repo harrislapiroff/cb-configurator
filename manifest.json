@@ -1,12 +1,39 @@
 {
-    "manifest_version":2,
-    "version":"0.1",
-    "name":"Caller's Box Term Changer",
+    "manifest_version": 3,
+    "version": "0.1",
+    "name": "Caller's Box Configurator",
     "content_scripts": [
         {
             "matches": ["*://*.ibiblio.org/contradance/thecallersbox/dance.php?id=*"],
             "js": ["maps.js", "main.js"],
             "run_at": "document_end"
         }
-    ]
+    ],
+    "options_ui": {
+        "page": "options.html"
+    },
+    "action": {
+        "default_icon": {
+            "19": "settings_19.png",
+            "38": "settings_38.png"
+        },
+        "default_popup": "options.html",
+        "default_title": "Caller's Box Configurator"
+    },
+	// Firefox should handle this; Chrome won't
+	"page_action": {
+		"default_popup": "options.html",
+		"default_icon": {
+			"19": "settings_19.png",
+			"38": "settings_38.png"
+		},
+		"default_title": "Caller's Box Configurator",
+		"show_matches": ["*://*.ibiblio.org/contradance/thecallersbox/dance.php?id=*"]
+	},
+    "browser_specific_settings": {
+        "gecko": {
+            "id": "callersboxconfigurator@chromamine.com"
+		}
+    },
+    "permissions": ["storage"]
 }
