@@ -2,6 +2,10 @@
     "manifest_version": 3,
     "version": "0.1",
     "name": "Caller's Box Configurator",
+	"icons": {
+		"48": "icons/color-box-48.png",
+		"96": "icons/color-box-96.png"
+	},
     "content_scripts": [
         {
             "matches": ["*://*.ibiblio.org/contradance/thecallersbox/dance.php?id=*"],
@@ -14,9 +18,9 @@
     },
     "action": {
         "default_icon": {
-            "19": "settings_19.png",
-            "38": "settings_38.png"
-        },
+			"48": "icons/color-box-48.png",
+			"96": "icons/color-box-96.png"
+		},
         "default_popup": "options.html",
         "default_title": "Caller's Box Configurator"
     },
@@ -24,8 +28,8 @@
 	"page_action": {
 		"default_popup": "options.html",
 		"default_icon": {
-			"19": "settings_19.png",
-			"38": "settings_38.png"
+			"48": "icons/color-box-48.png",
+			"96": "icons/color-box-96.png"
 		},
 		"default_title": "Caller's Box Configurator",
 		"show_matches": ["*://*.ibiblio.org/contradance/thecallersbox/dance.php?id=*"]
