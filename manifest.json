@@ -24,7 +24,6 @@
         "default_popup": "options.html",
         "default_title": "Caller's Box Configurator"
     },
-	// Firefox should handle this; Chrome won't
 	"page_action": {
 		"default_popup": "options.html",
 		"default_icon": {
