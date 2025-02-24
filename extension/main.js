@@ -13,6 +13,9 @@ const getOptions = async () => {
 		'useRSR',
 		'roleTerms',
 	])
+	if (data.enabled === undefined) data.enabled = true
+	if (data.useRSR === undefined) data.useRSR = true
+	if (data.roleTerms === undefined) data.roleTerms = 'birds'
 	return data
 }
 

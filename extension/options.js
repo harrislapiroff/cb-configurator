@@ -2,9 +2,9 @@ const browser = chrome || browser
 
 class OptionsForm extends HTMLElement {
 	_options = [
-		{ key: 'enabled', type: 'checkbox', default: true },
-		{ key: 'useRSR', type: 'checkbox', default: true },
-		{ key: 'roleTerms', type: 'text', default: 'birds' },
+		{ key: 'enabled', type: 'checkbox', default_: true },
+		{ key: 'useRSR', type: 'checkbox', default_: true },
+		{ key: 'roleTerms', type: 'text', default_: 'birds' },
 	]
 
 	connectedCallback() {
@@ -14,9 +14,10 @@ class OptionsForm extends HTMLElement {
 	}
 
 	async restoreOptions() {
-		const data = await browser.storage.sync.get(this._options_keys)
-		this._options.forEach(({ key, type }) => {
-			const value = data[key]
+		const keys = this._options.map(({ key }) => key)
+		const data = await browser.storage.sync.get(keys)
+		this._options.forEach(({ key, type, default_ }) => {
+			const value = (data[key] === undefined) ? default_ : data[key]
 			const el = this.form.querySelector(`[name=${key}]`)
 			if (type === 'checkbox') {
 				el.checked = value
