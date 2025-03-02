@@ -24,15 +24,6 @@
         "default_popup": "options.html",
         "default_title": "Caller's Box Configurator"
     },
-	"page_action": {
-		"default_popup": "options.html",
-		"default_icon": {
-			"48": "icons/color-box-48.png",
-			"96": "icons/color-box-96.png"
-		},
-		"default_title": "Caller's Box Configurator",
-		"show_matches": ["*://*.ibiblio.org/contradance/thecallersbox/dance.php?id=*"]
-	},
     "browser_specific_settings": {
         "gecko": {
             "id": "callersboxconfigurator@chromamine.com"
