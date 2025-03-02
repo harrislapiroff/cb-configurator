@@ -1,0 +1,14 @@
+{
+    "name": "cb-configurator",
+    "version": "1.0.0",
+    "description": "Browser extension configurator",
+    "scripts": {
+        "watch": "node scripts/watch.js"
+    },
+    "keywords": [
+        "browser-extension"
+    ],
+    "author": "",
+    "license": "MIT",
+    "dependencies": {}
+}
