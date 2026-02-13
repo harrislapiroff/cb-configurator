@@ -16,8 +16,9 @@ extension/           # All extension source files (loaded directly, no build ste
   icons/             # Extension icons (48, 96, 128 px)
 ```
 
-There is no build system, bundler, or package manager. The extension is loaded
-directly from the `extension/` directory.
+There is no build system or bundler. The extension source lives in `extension/`
+and is loaded directly. `web-ext` is used for linting, running in Firefox, and
+packaging for distribution.
 
 ## How It Works
 
@@ -31,12 +32,41 @@ directly from the `extension/` directory.
 
 ## Development
 
-### Loading the extension
+### Setup
+
+```sh
+npm install
+```
+
+### Running in Firefox
+
+```sh
+npm start
+```
+
+This uses `web-ext run` to launch Firefox with the extension loaded. It
+auto-reloads on file changes.
+
+### Loading manually
 
 - **Chrome:** Go to `chrome://extensions`, enable Developer Mode, click
   "Load unpacked", and select the `extension/` directory.
 - **Firefox:** Go to `about:debugging#/runtime/this-firefox`, click
   "Load Temporary Add-on", and select `extension/manifest.json`.
+
+### Linting
+
+```sh
+npm run lint
+```
+
+### Building for distribution
+
+```sh
+npm run build
+```
+
+This creates a `.zip` in `web-ext-artifacts/`.
 
 ### Code style
 

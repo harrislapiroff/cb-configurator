@@ -3,4 +3,5 @@ Thumbs.db
 *.swp
 *.swo
 *~
+node_modules/
 web-ext-artifacts/
