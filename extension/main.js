@@ -1,7 +1,7 @@
 // This script relies on maps.js loading first
 // and populating the global namespace
 
-const log = (str) => console?.log(`[Caller's Box Term Changer] ${str}`)
+const log = (str) => console?.log(`[Caller's Box Configurator] ${str}`)
 
 log("Running")
 
@@ -150,8 +150,8 @@ const init = async () => {
 	const options = await getOptions()
 
 	// Save the original HTML so we can undo this later
-	let phrasesTableHTML = document.getElementById('phrases').innerHTML
-	let formationValueCellHTML = Array.from(document.querySelectorAll('td'))
+	const phrasesTableHTML = document.getElementById('phrases').innerHTML
+	const formationValueCellHTML = Array.from(document.querySelectorAll('td'))
 		.find(cell => cell.textContent.includes('FormationDetail'))
 		?.nextElementSibling?.innerHTML
 	
