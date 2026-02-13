@@ -5,7 +5,7 @@ const log = (str) => console?.log(`[Caller's Box Term Changer] ${str}`)
 
 log("Running")
 
-const browser = chrome || browser
+const browser = globalThis.chrome ?? globalThis.browser
 
 const getOptions = async () => {
 	const data = await browser.storage.sync.get([
@@ -135,7 +135,7 @@ const replaceMicroNotationFormation = (terms) => {
 
 	if (!formationDetailValCell) return
 
-	formationTextNodes = getDescendentTextNodes(formationDetailValCell)
+	const formationTextNodes = getDescendentTextNodes(formationDetailValCell)
 	formationTextNodes.forEach(node => {
 		node.textContent = node.textContent
 			.replace(/M([LR0-9][RL]?)/g, `${terms.get('MICRO_L')}$1`)
@@ -153,6 +153,7 @@ const init = async () => {
 	let phrasesTableHTML = document.getElementById('phrases').innerHTML
 	let formationValueCellHTML = Array.from(document.querySelectorAll('td'))
 		.find(cell => cell.textContent.includes('FormationDetail'))
+		?.nextElementSibling?.innerHTML
 	
 	const replaceAll = (options) => {
 		if (!options.enabled) return
