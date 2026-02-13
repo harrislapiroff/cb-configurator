@@ -28,7 +28,8 @@
 	},
 	"browser_specific_settings": {
 		"gecko": {
-			"id": "callersboxconfigurator@chromamine.com"
+			"id": "callersboxconfigurator@chromamine.com",
+			"strict_min_version": "109.0"
 		}
 	},
 	"permissions": ["storage"]
