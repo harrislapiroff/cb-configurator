@@ -6,9 +6,15 @@
 	"scripts": {
 		"start": "web-ext run -s extension/",
 		"build": "web-ext build -s extension/",
-		"lint": "web-ext lint -s extension/"
+		"lint": "eslint extension/ && web-ext lint -s extension/",
+		"lint:js": "eslint extension/",
+		"lint:ext": "web-ext lint -s extension/",
+		"test": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test 'tests/**/*.test.mjs'"
 	},
 	"devDependencies": {
+		"eslint": "^8.57.1",
+		"globals": "^17.3.0",
+		"jsdom": "^25.0.1",
 		"web-ext": "^8.0.0"
 	}
 }

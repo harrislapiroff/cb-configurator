@@ -1,5 +1,8 @@
-// This script relies on maps.js loading first
-// and populating the global namespace
+import {
+	HALF_GYP_TERMS,
+	ROLE_TERMS_BIRDS,
+	ROLE_TERMS_LF,
+} from './maps.js'
 
 const log = (str) => console?.log(`[Caller's Box Configurator] ${str}`)
 
@@ -19,7 +22,7 @@ const getOptions = async () => {
 	return data
 }
 
-const getDescendentTextNodes = el => {
+export const getDescendentTextNodes = el => {
 	const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null, false)
 	const nodes = []
 	while (walker.nextNode()) {
@@ -28,15 +31,15 @@ const getDescendentTextNodes = el => {
 	return nodes
 }
 
-const getFormationCell = () => {
+export const getFormationCell = () => {
 	return Array.from(document.querySelectorAll('td'))
 		.find(cell => cell.textContent.includes('FormationDetail'))
 		?.nextElementSibling
 }
 
-const replaceTerm = (termMap) => (key) => (el) => el.textContent = termMap.get(key)
+export const replaceTerm = (termMap) => (key) => (el) => el.textContent = termMap.get(key)
 
-const replaceRoles = (terms) => {
+export const replaceRoles = (terms) => {
 	if (!terms.has('ROLE_R')) return
 
 	const term = replaceTerm(terms)
@@ -46,7 +49,7 @@ const replaceRoles = (terms) => {
 		.forEach(term('ROLE_R'))
 }
 
-const replaceChains = (terms) => {
+export const replaceChains = (terms) => {
 	if (!terms.has('CHAIN_R')) return
 
 	const term = replaceTerm(terms)
@@ -70,15 +73,15 @@ const replaceChains = (terms) => {
 		.forEach(term('THREE_CHAIN_R'))
 }
 
-const replaceDoubleGyp = (terms) => {
+export const replaceDoubleGyp = (terms) => {
 	if (!terms.has('DOUBLE_TRADE')) return
-	
+
 	const term = replaceTerm(terms)
 	document.querySelectorAll('a[href$="#double-gyp"]')
 		.forEach(term('DOUBLE_TRADE'))
 }
 
-const replaceMicroNotationChoreo = (terms) => {
+export const replaceMicroNotationChoreo = (terms) => {
 	if (!terms.has('MICRO_L')) return
 
 	// Replacing micro notation is also a little tricky. It isn't wrapped in
@@ -104,7 +107,7 @@ const replaceMicroNotationChoreo = (terms) => {
 	})
 }
 
-const replaceMicroNotationFormation = (terms) => {
+export const replaceMicroNotationFormation = (terms) => {
 	if (!terms.has('MICRO_L')) return
 
 	// We also need to replace the micro notation in Formation Detail table
@@ -123,9 +126,27 @@ const replaceMicroNotationFormation = (terms) => {
 
 }
 
-// Instantiation:
+export const buildTerms = (options) => {
+	const termMaps = []
+	if (options.useRSR) termMaps.push(HALF_GYP_TERMS)
+	if (options.roleTerms === 'birds') termMaps.push(ROLE_TERMS_BIRDS)
+	if (options.roleTerms === 'lf') termMaps.push(ROLE_TERMS_LF)
+	return new Map([...termMaps.map(map => [...map])].flat())
+}
+
+export const replaceAll = (options) => {
+	if (!options.enabled) return
+	log("Replacing terms")
+	const terms = buildTerms(options)
+	replaceRoles(terms)
+	replaceChains(terms)
+	replaceDoubleGyp(terms)
+	replaceMicroNotationChoreo(terms)
+	replaceMicroNotationFormation(terms)
+}
+
+// Instantiation (only runs in extension context):
 const init = async () => {
-	// Get initial options
 	const options = await getOptions()
 
 	// Save the original HTML so we can undo this later
@@ -138,25 +159,6 @@ const init = async () => {
 	const formationValueCellHTML = Array.from(document.querySelectorAll('td'))
 		.find(cell => cell.textContent.includes('FormationDetail'))
 		?.nextElementSibling?.innerHTML
-	
-	const replaceAll = (options) => {
-		if (!options.enabled) return
-
-		log("Replacing terms")
-
-		const termMaps = []
-		if (options.useRSR) termMaps.push(HALF_GYP_TERMS)
-		if (options.roleTerms === 'birds') termMaps.push(ROLE_TERMS_BIRDS)
-		if (options.roleTerms === 'lf') termMaps.push(ROLE_TERMS_LF)
-
-		const terms = new Map([...termMaps.map(map => [...map])].flat())
-
-		replaceRoles(terms)
-		replaceChains(terms)
-		replaceDoubleGyp(terms)
-		replaceMicroNotationChoreo(terms)
-		replaceMicroNotationFormation(terms)
-	}
 
 	const revert = () => {
 		document.getElementById('phrases').innerHTML = phrasesTableHTML

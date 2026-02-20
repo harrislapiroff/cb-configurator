@@ -11,7 +11,7 @@
 	"content_scripts": [
 		{
 			"matches": ["*://*.ibiblio.org/contradance/thecallersbox/dance.php?id=*"],
-			"js": ["maps.js", "main.js"],
+			"js": ["content-script.js"],
 			"run_at": "document_end"
 		}
 	],
@@ -32,5 +32,11 @@
 			"strict_min_version": "109.0"
 		}
 	},
+	"web_accessible_resources": [
+		{
+			"resources": ["main.js", "maps.js"],
+			"matches": ["*://*.ibiblio.org/*"]
+		}
+	],
 	"permissions": ["storage"]
 }
