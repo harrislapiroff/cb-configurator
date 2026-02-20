@@ -6,9 +6,13 @@
 	"scripts": {
 		"start": "web-ext run -s extension/",
 		"build": "web-ext build -s extension/",
-		"lint": "web-ext lint -s extension/"
+		"lint": "eslint extension/ && web-ext lint -s extension/",
+		"lint:js": "eslint extension/",
+		"lint:ext": "web-ext lint -s extension/"
 	},
 	"devDependencies": {
+		"eslint": "^8.57.1",
+		"globals": "^17.3.0",
 		"web-ext": "^8.0.0"
 	}
 }

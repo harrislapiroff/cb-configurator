@@ -1,5 +1,9 @@
-// This script relies on maps.js loading first
-// and populating the global namespace
+import {
+	RSR_TERMS,
+	HALF_GYP_TERMS,
+	ROLE_TERMS_BIRDS,
+	ROLE_TERMS_LF,
+} from './maps.js'
 
 const log = (str) => console?.log(`[Caller's Box Configurator] ${str}`)
 

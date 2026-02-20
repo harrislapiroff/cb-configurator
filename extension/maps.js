@@ -1,10 +1,10 @@
-const HALF_GYP_TERMS = new Map([
+export const HALF_GYP_TERMS = new Map([
 	// Double gyp always seems to show up as "Corner trade 4 (quick trades)"
 	// so this should be a reasonable substitution
 	['DOUBLE_TRADE', 'quick trades'],
 ])
 
-const ROLE_TERMS_BIRDS = new Map([
+export const ROLE_TERMS_BIRDS = new Map([
 	['ROLE_R', 'Robins'],
 	['ROLE_L', 'Larks'],
 	['CHAIN_R', 'Robins chain'],
@@ -20,7 +20,7 @@ const ROLE_TERMS_BIRDS = new Map([
 	['MICRO_L', 'L'],
 ])
 
-const ROLE_TERMS_LF = new Map([
+export const ROLE_TERMS_LF = new Map([
 	['ROLE_R', 'Follows'],
 	['ROLE_L', 'Leads'],
 	['CHAIN_R', 'Follows chain'],
