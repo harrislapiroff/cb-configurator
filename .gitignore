@@ -4,4 +4,5 @@ Thumbs.db
 *.swo
 *~
 node_modules/
+safari/
 web-ext-artifacts/
