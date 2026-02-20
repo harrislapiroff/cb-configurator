@@ -56,6 +56,18 @@ describe('manifest.json', () => {
 		}
 	})
 
+	it('references web_accessible_resources files that exist', () => {
+		for (const entry of manifest.web_accessible_resources ?? []) {
+			for (const resource of entry.resources) {
+				const filePath = join(extDir, resource)
+				assert.ok(
+					existsSync(filePath),
+					`Web-accessible resource missing: ${resource}`
+				)
+			}
+		}
+	})
+
 	it('content script entry point does not use static import syntax', () => {
 		for (const cs of manifest.content_scripts) {
 			for (const jsFile of cs.js) {

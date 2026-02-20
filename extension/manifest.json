@@ -32,5 +32,11 @@
 			"strict_min_version": "109.0"
 		}
 	},
+	"web_accessible_resources": [
+		{
+			"resources": ["main.js", "maps.js"],
+			"matches": ["*://*.ibiblio.org/*"]
+		}
+	],
 	"permissions": ["storage"]
 }
