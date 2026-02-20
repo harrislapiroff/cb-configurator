@@ -4,7 +4,6 @@ import { setupDOM } from './setup.mjs'
 import {
 	replaceRoles,
 	replaceChains,
-	replaceShoulderRounds,
 	replaceDoubleGyp,
 	replaceMicroNotationChoreo,
 	replaceMicroNotationFormation,
@@ -14,7 +13,6 @@ import {
 	getFormationCell,
 } from '../extension/main.js'
 import {
-	RSR_TERMS,
 	HALF_GYP_TERMS,
 	ROLE_TERMS_BIRDS,
 	ROLE_TERMS_LF,
@@ -27,15 +25,13 @@ const mergeTerms = (...maps) =>
 // ── buildTerms ──────────────────────────────────────────────────────────
 
 describe('buildTerms', () => {
-	it('includes RSR and half-gyp terms when useRSR is true', () => {
+	it('includes half-gyp terms when useRSR is true', () => {
 		const terms = buildTerms({ useRSR: true, roleTerms: 'mw' })
-		assert.equal(terms.get('RSR'), 'right shoulder round')
 		assert.equal(terms.get('DOUBLE_TRADE'), 'quick trades')
 	})
 
-	it('excludes RSR terms when useRSR is false', () => {
+	it('excludes half-gyp terms when useRSR is false', () => {
 		const terms = buildTerms({ useRSR: false, roleTerms: 'mw' })
-		assert.equal(terms.has('RSR'), false)
 		assert.equal(terms.has('DOUBLE_TRADE'), false)
 	})
 
@@ -143,46 +139,6 @@ describe('replaceChains', () => {
 		assert.equal(
 			document.querySelector('a[href$="#ladies-chain"]').textContent,
 			'ladies chain'
-		)
-	})
-})
-
-// ── replaceShoulderRounds ───────────────────────────────────────────────
-
-describe('replaceShoulderRounds', () => {
-	const terms = mergeTerms(RSR_TERMS)
-
-	beforeEach(() => {
-		setupDOM(`<!DOCTYPE html><html><body>
-			<span><a href="/glossary#gypsy">gypsy</a> right shoulder round</span>
-			<span><a href="/glossary#gypsy">gypsy</a> left shoulder round</span>
-		</body></html>`)
-	})
-
-	it('replaces "gypsy right" with "right shoulder round"', () => {
-		replaceShoulderRounds(terms)
-		const gypsys = document.querySelectorAll('a[href$="#gypsy"]')
-		assert.equal(gypsys[0].textContent, 'right shoulder round')
-	})
-
-	it('replaces "gypsy left" with "left shoulder round"', () => {
-		replaceShoulderRounds(terms)
-		const gypsys = document.querySelectorAll('a[href$="#gypsy"]')
-		assert.equal(gypsys[1].textContent, 'left shoulder round')
-	})
-
-	it('removes the direction word from the following text node', () => {
-		replaceShoulderRounds(terms)
-		const gypsys = document.querySelectorAll('a[href$="#gypsy"]')
-		// The text after the link should have the direction word removed
-		assert.ok(!gypsys[0].nextSibling.textContent.includes('right'))
-	})
-
-	it('does nothing when terms has no RSR key', () => {
-		replaceShoulderRounds(new Map())
-		assert.equal(
-			document.querySelector('a[href$="#gypsy"]').textContent,
-			'gypsy'
 		)
 	})
 })
@@ -329,7 +285,6 @@ describe('replaceAll', () => {
 				<a href="/glossary#men">men</a>
 				<a href="/glossary#women">women</a>
 				<a href="/glossary#ladies-chain">ladies chain</a>
-				<a href="/glossary#gypsy">gypsy</a> right
 				<a href="/glossary#double-gyp">double gyp</a>
 				<span>MR WL</span>
 			</div>
@@ -353,10 +308,6 @@ describe('replaceAll', () => {
 		assert.equal(
 			document.querySelector('a[href$="#ladies-chain"]').textContent,
 			'Robins chain'
-		)
-		assert.equal(
-			document.querySelector('a[href$="#gypsy"]').textContent,
-			'right shoulder round'
 		)
 		assert.equal(
 			document.querySelector('a[href$="#double-gyp"]').textContent,

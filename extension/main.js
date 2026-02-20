@@ -1,5 +1,4 @@
 import {
-	RSR_TERMS,
 	HALF_GYP_TERMS,
 	ROLE_TERMS_BIRDS,
 	ROLE_TERMS_LF,
@@ -75,30 +74,6 @@ export const replaceChains = (terms) => {
 }
 
 export const replaceDoubleGyp = (terms) => {
-	if (!terms.has('RSR')) return
-
-	// Replacing gypsy is a little trickier since in Caller's Box
-	// the figure is notated, e.g.,
-	//     `<a href="...">gypsy</a> right`
-	// and we want to replace it with
-	//     `<a href="...">right shoulder round</a>`
-
-	document.querySelectorAll('a[href$="#gypsy"]').forEach(element => {
-		// We need the next node (should be a text node starting with "right" or
-		// "left") for a couple purposes
-		const nextSibling = element.nextSibling
-		if (!nextSibling || !nextSibling.textContent) return
-		// Get the direction of the shoulder round by checking the next word
-		const direction = nextSibling.textContent.trim().split(' ')[0]
-		// Remove that word from the next node
-		nextSibling.textContent = nextSibling.textContent.replace(direction, '')
-		// Replace the term
-		const term = direction === 'right' ? 'RSR' : 'LSR'
-		element.textContent = terms.get(term)
-	})
-}
-
-export const replaceDoubleGyp = (terms) => {
 	if (!terms.has('DOUBLE_TRADE')) return
 
 	const term = replaceTerm(terms)
@@ -153,7 +128,6 @@ export const replaceMicroNotationFormation = (terms) => {
 
 export const buildTerms = (options) => {
 	const termMaps = []
-	if (options.useRSR) termMaps.push(RSR_TERMS)
 	if (options.useRSR) termMaps.push(HALF_GYP_TERMS)
 	if (options.roleTerms === 'birds') termMaps.push(ROLE_TERMS_BIRDS)
 	if (options.roleTerms === 'lf') termMaps.push(ROLE_TERMS_LF)
@@ -166,7 +140,6 @@ export const replaceAll = (options) => {
 	const terms = buildTerms(options)
 	replaceRoles(terms)
 	replaceChains(terms)
-	replaceShoulderRounds(terms)
 	replaceDoubleGyp(terms)
 	replaceMicroNotationChoreo(terms)
 	replaceMicroNotationFormation(terms)

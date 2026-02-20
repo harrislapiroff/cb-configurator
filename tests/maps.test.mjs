@@ -1,17 +1,12 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 import {
-	RSR_TERMS,
 	HALF_GYP_TERMS,
 	ROLE_TERMS_BIRDS,
 	ROLE_TERMS_LF,
 } from '../extension/maps.js'
 
 describe('maps.js exports', () => {
-	it('exports RSR_TERMS as a Map', () => {
-		assert.ok(RSR_TERMS instanceof Map)
-	})
-
 	it('exports HALF_GYP_TERMS as a Map', () => {
 		assert.ok(HALF_GYP_TERMS instanceof Map)
 	})
@@ -22,16 +17,6 @@ describe('maps.js exports', () => {
 
 	it('exports ROLE_TERMS_LF as a Map', () => {
 		assert.ok(ROLE_TERMS_LF instanceof Map)
-	})
-})
-
-describe('RSR_TERMS', () => {
-	it('has right shoulder round', () => {
-		assert.equal(RSR_TERMS.get('RSR'), 'right shoulder round')
-	})
-
-	it('has left shoulder round', () => {
-		assert.equal(RSR_TERMS.get('LSR'), 'left shoulder round')
 	})
 })
 
