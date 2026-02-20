@@ -1,11 +1,11 @@
 // This script relies on maps.js loading first
 // and populating the global namespace
 
-const log = (str) => console?.log(`[Caller's Box Term Changer] ${str}`)
+const log = (str) => console?.log(`[Caller's Box Configurator] ${str}`)
 
 log("Running")
 
-const browser = chrome || browser
+const browser = globalThis.chrome ?? globalThis.browser
 
 const getOptions = async () => {
 	const data = await browser.storage.sync.get([
@@ -83,6 +83,7 @@ const replaceShoulderRounds = (terms) => {
 		// We need the next node (should be a text node starting with "right" or
 		// "left") for a couple purposes
 		const nextSibling = element.nextSibling
+		if (!nextSibling || !nextSibling.textContent) return
 		// Get the direction of the shoulder round by checking the next word
 		const direction = nextSibling.textContent.trim().split(' ')[0]
 		// Remove that word from the next node 
@@ -110,7 +111,9 @@ const replaceMicroNotationChoreo = (terms) => {
 	//
 	// Honestly, it's possibly more of our substitutions should take this
 	// approach... but that's a consideration for later.
-	const choreoTextNodes = getDescendentTextNodes(document.getElementById('phrases'))
+	const phrasesEl = document.getElementById('phrases')
+	if (!phrasesEl) return
+	const choreoTextNodes = getDescendentTextNodes(phrasesEl)
 	choreoTextNodes.forEach(node => {
 		// We're trying to capture any two character sequences that look like:
 		//    MR, LL, M1, R2, etc.
@@ -135,7 +138,7 @@ const replaceMicroNotationFormation = (terms) => {
 
 	if (!formationDetailValCell) return
 
-	formationTextNodes = getDescendentTextNodes(formationDetailValCell)
+	const formationTextNodes = getDescendentTextNodes(formationDetailValCell)
 	formationTextNodes.forEach(node => {
 		node.textContent = node.textContent
 			.replace(/M([LR0-9][RL]?)/g, `${terms.get('MICRO_L')}$1`)
@@ -150,9 +153,15 @@ const init = async () => {
 	const options = await getOptions()
 
 	// Save the original HTML so we can undo this later
-	let phrasesTableHTML = document.getElementById('phrases').innerHTML
-	let formationValueCellHTML = Array.from(document.querySelectorAll('td'))
+	const phrasesEl = document.getElementById('phrases')
+	if (!phrasesEl) {
+		log("No #phrases element found, skipping")
+		return
+	}
+	const phrasesTableHTML = phrasesEl.innerHTML
+	const formationValueCellHTML = Array.from(document.querySelectorAll('td'))
 		.find(cell => cell.textContent.includes('FormationDetail'))
+		?.nextElementSibling?.innerHTML
 	
 	const replaceAll = (options) => {
 		if (!options.enabled) return
@@ -192,4 +201,4 @@ const init = async () => {
 	replaceAll(options)
 }
 
-init()
+init().catch(err => log(`Error: ${err.message}`))

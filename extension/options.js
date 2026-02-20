@@ -1,4 +1,4 @@
-const browser = chrome || browser
+const browser = globalThis.chrome ?? globalThis.browser
 
 class OptionsForm extends HTMLElement {
 	_options = [
