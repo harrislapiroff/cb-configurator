@@ -1,8 +1,3 @@
-const RSR_TERMS = new Map([
-	['RSR', 'right shoulder round'],
-	['LSR', 'left shoulder round'],
-])
-
 const HALF_GYP_TERMS = new Map([
 	// Double gyp always seems to show up as "Corner trade 4 (quick trades)"
 	// so this should be a reasonable substitution
