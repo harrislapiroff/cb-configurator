@@ -68,6 +68,53 @@ describe('manifest.json', () => {
 		}
 	})
 
+	it('dynamically imported modules are in web_accessible_resources', () => {
+		const webAccessible = new Set(
+			(manifest.web_accessible_resources ?? [])
+				.flatMap(entry => entry.resources)
+		)
+
+		// Collect all modules reachable from content script dynamic imports
+		const collectImports = (file, seen = new Set()) => {
+			if (seen.has(file)) return seen
+			seen.add(file)
+			const source = readFileSync(join(extDir, file), 'utf8')
+			// Match static import declarations: import ... from './foo.js'
+			const importRe = /^\s*import\s[\s\S]*?\sfrom\s+['"]([^'"]+)['"]/gm
+			let match
+			while ((match = importRe.exec(source)) !== null) {
+				// Resolve relative specifier (e.g. './maps.js') to bare filename
+				const specifier = match[1]
+				const resolved = specifier.startsWith('./')
+					? specifier.slice(2)
+					: specifier
+				collectImports(resolved, seen)
+			}
+			return seen
+		}
+
+		for (const cs of manifest.content_scripts) {
+			for (const jsFile of cs.js) {
+				const source = readFileSync(join(extDir, jsFile), 'utf8')
+				// Match dynamic imports: import(....getURL('main.js'))
+				const dynamicRe = /runtime\.getURL\(\s*['"]([^'"]+)['"]\s*\)/g
+				let match
+				while ((match = dynamicRe.exec(source)) !== null) {
+					const allModules = collectImports(match[1])
+					for (const mod of allModules) {
+						assert.ok(
+							webAccessible.has(mod),
+							`${mod} is dynamically imported (from ${jsFile}) ` +
+							'but not listed in web_accessible_resources. ' +
+							'Browsers block content script module imports ' +
+							'unless the resource is web-accessible.'
+						)
+					}
+				}
+			}
+		}
+	})
+
 	it('content script entry point does not use static import syntax', () => {
 		for (const cs of manifest.content_scripts) {
 			for (const jsFile of cs.js) {
