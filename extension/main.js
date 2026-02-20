@@ -1,15 +1,8 @@
-import {
-	RSR_TERMS,
-	HALF_GYP_TERMS,
-	ROLE_TERMS_BIRDS,
-	ROLE_TERMS_LF,
-} from './maps.js'
+const browser = globalThis.chrome ?? globalThis.browser
 
 const log = (str) => console?.log(`[Caller's Box Configurator] ${str}`)
 
 log("Running")
-
-const browser = globalThis.chrome ?? globalThis.browser
 
 const getOptions = async () => {
 	const data = await browser.storage.sync.get([
@@ -129,6 +122,15 @@ const replaceMicroNotationFormation = (terms) => {
 
 // Instantiation:
 const init = async () => {
+	// Import term maps (dynamic import because content scripts can't use
+	// static ES module imports)
+	const {
+		RSR_TERMS,
+		HALF_GYP_TERMS,
+		ROLE_TERMS_BIRDS,
+		ROLE_TERMS_LF,
+	} = await import(browser.runtime.getURL('maps.js'))
+
 	// Get initial options
 	const options = await getOptions()
 

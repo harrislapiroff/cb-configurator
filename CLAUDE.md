@@ -10,7 +10,7 @@ dance choreography website with gender-neutral alternatives.
 extension/           # All extension source files (loaded directly, no build step)
   manifest.json      # MV3 manifest — defines content scripts, permissions, icons
   maps.js            # Term mapping constants (ES module, exports Map objects)
-  main.js            # Content script entry point (imports maps.js)
+  main.js            # Content script entry point (dynamically imports maps.js)
   options.html       # Settings popup / options page UI
   options.js         # Web Component for the settings form
   icons/             # Extension icons (48, 96, 128 px)
@@ -18,17 +18,18 @@ eslint.config.mjs    # ESLint flat config
 ```
 
 There is no build system or bundler. The extension source lives in `extension/`
-and is loaded directly. Scripts use ES module syntax (`import`/`export`);
-content scripts are declared with `"type": "module"` in the manifest. `web-ext`
-is used for running in Firefox and packaging for distribution.
+and is loaded directly. `maps.js` uses ES module `export` syntax; the content
+script (`main.js`) loads it via dynamic `import()` since browsers don't support
+static ES module imports in content scripts. `web-ext` is used for running in
+Firefox and packaging for distribution.
 
 ## How It Works
 
 1. `maps.js` exports `Map` constants for terminology substitutions (e.g.,
    `RSR_TERMS`, `ROLE_TERMS_BIRDS`, `ROLE_TERMS_LF`).
-2. `main.js` is the content script entry point. It imports the term maps from
-   `maps.js`, reads user preferences from `browser.storage.sync`, then performs
-   DOM text replacements.
+2. `main.js` is the content script entry point. It dynamically imports the term
+   maps from `maps.js`, reads user preferences from `browser.storage.sync`,
+   then performs DOM text replacements.
 3. `options.js` defines a `<cb-options-form>` custom element that persists
    settings to `browser.storage.sync`. The options page doubles as the popup.
 
