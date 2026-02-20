@@ -6,7 +6,7 @@
 	"scripts": {
 		"start": "web-ext run -s extension/",
 		"build": "web-ext build -s extension/",
-		"build:safari": "xcrun safari-web-extension-converter extension/ --project-location safari/ --app-name \"Caller's Box Configurator\" --bundle-identifier com.chromamine.callersboxconfigurator --swift --no-open --force",
+		"build:safari": "xcrun safari-web-extension-packager extension/ --project-location safari/ --app-name \"Caller's Box Configurator\" --bundle-identifier com.chromamine.callersboxconfigurator --swift --no-open --no-prompt --force",
 		"lint": "eslint extension/ && web-ext lint -s extension/",
 		"lint:js": "eslint extension/",
 		"lint:ext": "web-ext lint -s extension/",

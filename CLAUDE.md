@@ -168,7 +168,7 @@ extensions.
 npm run build:safari
 ```
 
-This runs Apple's `xcrun safari-web-extension-converter` on the `extension/`
+This runs Apple's `xcrun safari-web-extension-packager` on the `extension/`
 directory and writes an Xcode project to `safari/`. The generated project
 includes targets for both **macOS** and **iOS/iPadOS** — no separate script is
 needed for mobile. The `--force` flag means re-running the command will
