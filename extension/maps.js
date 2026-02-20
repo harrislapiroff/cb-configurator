@@ -30,7 +30,7 @@ export const ROLE_TERMS_LF = new Map([
 	['GRAND_CHAIN_L', 'Leads grand chain'],
 	['OPEN_CHAIN_R', 'Follows open chain'],
 	['OPEN_CHAIN_L', 'Leads open chain'],
-	['THREE_CHAIN_R', 'Three follows chain'],
+	['THREE_CHAIN_R', 'Three Follows chain'],
 	// Single initials for micro-notation, such as in hey or waves descriptions
 	['MICRO_R', 'F'],
 	['MICRO_L', 'L'],
