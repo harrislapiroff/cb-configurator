@@ -7,6 +7,9 @@ export const HALF_GYP_TERMS = new Map([
 export const ROLE_TERMS_BIRDS = new Map([
 	['ROLE_R', 'Robins'],
 	['ROLE_L', 'Larks'],
+	// Singular forms for plain-text occurrences like "man one" / "woman two"
+	['ROLE_R_S', 'Robin'],
+	['ROLE_L_S', 'Lark'],
 	['CHAIN_R', 'Robins chain'],
 	['CHAIN_L', 'Larks chain'],
 	['CHAIN_R_BY_L', 'right-hand chain'],
@@ -23,6 +26,9 @@ export const ROLE_TERMS_BIRDS = new Map([
 export const ROLE_TERMS_LF = new Map([
 	['ROLE_R', 'Follows'],
 	['ROLE_L', 'Leads'],
+	// Singular forms for plain-text occurrences like "man one" / "woman two"
+	['ROLE_R_S', 'Follow'],
+	['ROLE_L_S', 'Lead'],
 	['CHAIN_R', 'Follows chain'],
 	['CHAIN_L', 'Leads chain'],
 	['CHAIN_R_BY_L', 'right-hand chain'],
