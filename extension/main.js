@@ -143,16 +143,21 @@ export const matchCapitalization = (original, replacement) => {
 	return replacement.toLowerCase()
 }
 
-// Replace plain-text occurrences of man/woman/men/women in a list of text nodes.
-// Uses word boundaries so "promenade" is not affected, and preserves the
-// capitalization style of each matched word.
+// Replace plain-text occurrences of gendered role words (man/woman/men/women
+// and lady/gent/ladies/gents) in a list of text nodes. Uses word boundaries so
+// "promenade" is not affected, and preserves the capitalization style of each
+// matched word.
 const replaceGenderedWordsInNodes = (nodes, terms) => {
 	nodes.forEach(node => {
 		node.textContent = node.textContent
 			.replace(/\bwomen\b/gi, (m) => matchCapitalization(m, terms.get('ROLE_R')))
 			.replace(/\bwoman\b/gi, (m) => matchCapitalization(m, terms.get('ROLE_R_S')))
+			.replace(/\bladies\b/gi, (m) => matchCapitalization(m, terms.get('ROLE_R')))
+			.replace(/\blady\b/gi, (m) => matchCapitalization(m, terms.get('ROLE_R_S')))
 			.replace(/\bmen\b/gi, (m) => matchCapitalization(m, terms.get('ROLE_L')))
 			.replace(/\bman\b/gi, (m) => matchCapitalization(m, terms.get('ROLE_L_S')))
+			.replace(/\bgents\b/gi, (m) => matchCapitalization(m, terms.get('ROLE_L')))
+			.replace(/\bgent\b/gi, (m) => matchCapitalization(m, terms.get('ROLE_L_S')))
 	})
 }
 
@@ -187,6 +192,36 @@ export const replaceVariantVideos = (terms) => {
 	replaceGenderedWordsInNodes(textNodes, terms)
 }
 
+export const getCallingNotesContainer = () => {
+	for (const h of document.querySelectorAll('h2')) {
+		if (h.textContent.includes('Calling Notes')) {
+			return h.parentElement
+		}
+	}
+	return null
+}
+
+// Replace "same gender"/"same gendered" → "same role" and
+// "opposite gender"/"opposite gendered" → "opposite role" in a list of text
+// nodes, preserving the capitalization of the matched phrase.
+const replaceGenderPhrasesInNodes = (nodes) => {
+	nodes.forEach(node => {
+		node.textContent = node.textContent
+			.replace(/\bsame gender(?:ed)?\b/gi, (m) => matchCapitalization(m, 'same role'))
+			.replace(/\bopposite gender(?:ed)?\b/gi, (m) => matchCapitalization(m, 'opposite role'))
+	})
+}
+
+export const replaceCallingNotes = (terms) => {
+	if (!terms.has('ROLE_L')) return
+
+	const container = getCallingNotesContainer()
+	if (!container) return
+	const textNodes = getDescendentTextNodes(container)
+	replaceGenderedWordsInNodes(textNodes, terms)
+	replaceGenderPhrasesInNodes(textNodes)
+}
+
 export const buildTerms = (options) => {
 	const termMaps = []
 	if (options.useRSR) termMaps.push(HALF_GYP_TERMS)
@@ -206,6 +241,7 @@ export const replaceAll = (options) => {
 	replaceMicroNotationFormation(terms)
 	replaceRoleTextInPhrases(terms)
 	replaceVariantVideos(terms)
+	replaceCallingNotes(terms)
 }
 
 // Instantiation (only runs in extension context):
@@ -223,6 +259,7 @@ const init = async () => {
 		.find(cell => cell.textContent.includes('FormationDetail'))
 		?.nextElementSibling?.innerHTML
 	const variantVideosCellHTML = getVariantVideosCell()?.innerHTML
+	const callingNotesContainerHTML = getCallingNotesContainer()?.innerHTML
 
 	const revert = () => {
 		document.getElementById('phrases').innerHTML = phrasesTableHTML
@@ -230,6 +267,8 @@ const init = async () => {
 		if (formationCell) formationCell.innerHTML = formationValueCellHTML
 		const variantVideosCell = getVariantVideosCell()
 		if (variantVideosCell) variantVideosCell.innerHTML = variantVideosCellHTML
+		const callingNotesContainer = getCallingNotesContainer()
+		if (callingNotesContainer) callingNotesContainer.innerHTML = callingNotesContainerHTML
 	}
 
 	// When options change, rerender

@@ -9,11 +9,13 @@ import {
 	replaceMicroNotationFormation,
 	replaceRoleTextInPhrases,
 	replaceVariantVideos,
+	replaceCallingNotes,
 	buildTerms,
 	replaceAll,
 	getDescendentTextNodes,
 	getFormationCell,
 	getVariantVideosCell,
+	getCallingNotesContainer,
 	matchCapitalization,
 } from '../extension/main.js'
 import {
@@ -325,6 +327,124 @@ describe('replaceRoleTextInPhrases', () => {
 	})
 })
 
+// ── replaceRoleTextInPhrases – ladies/gents ──────────────────────────────
+
+describe('replaceRoleTextInPhrases – ladies/gents', () => {
+	const terms = mergeTerms(ROLE_TERMS_BIRDS)
+
+	it('replaces ladies/gents with role terms, preserving capitalization', () => {
+		setupDOM(`<!DOCTYPE html><html><body>
+			<div id="phrases">
+				<p>Ladies go first; gents follow</p>
+				<p>Lady one and gent two swing</p>
+			</div>
+		</body></html>`)
+		replaceRoleTextInPhrases(terms)
+		const paras = document.querySelectorAll('#phrases p')
+		assert.equal(paras[0].textContent, 'Robins go first; larks follow')
+		assert.equal(paras[1].textContent, 'Robin one and lark two swing')
+	})
+
+	it('does not replace ladies/gents inside other words', () => {
+		setupDOM(`<!DOCTYPE html><html><body>
+			<div id="phrases"><p>agents ladybird</p></div>
+		</body></html>`)
+		replaceRoleTextInPhrases(terms)
+		const para = document.querySelector('#phrases p')
+		assert.equal(para.textContent, 'agents ladybird')
+	})
+})
+
+// ── getCallingNotesContainer ────────────────────────────────────────────
+
+describe('getCallingNotesContainer', () => {
+	it('returns the parent element of the Calling Notes heading', () => {
+		setupDOM(`<!DOCTYPE html><html><body>
+			<div class="box"><h2>Calling Notes:</h2><p>Some notes here.</p></div>
+		</body></html>`)
+		const container = getCallingNotesContainer()
+		assert.ok(container)
+		assert.equal(container.tagName, 'DIV')
+		assert.ok(container.textContent.includes('Some notes here.'))
+	})
+
+	it('returns null when no Calling Notes heading exists', () => {
+		setupDOM('<!DOCTYPE html><html><body></body></html>')
+		assert.equal(getCallingNotesContainer(), null)
+	})
+})
+
+// ── replaceCallingNotes ─────────────────────────────────────────────────
+
+describe('replaceCallingNotes', () => {
+	const terms = mergeTerms(ROLE_TERMS_BIRDS)
+
+	beforeEach(() => {
+		setupDOM(`<!DOCTYPE html><html><body>
+			<div class="box">
+				<h2>Calling Notes:</h2>
+				The women go in first. The men follow.<br>
+				Everyone ends in the spot of their opposite gendered neighbor,
+				having gone around the spot of their same gendered neighbor.<br>
+				Same gender pairs face across. Opposite gender pairs face along.<br>
+				The lady leads the gent through the arch.
+			</div>
+		</body></html>`)
+	})
+
+	it('replaces men/women with role terms', () => {
+		replaceCallingNotes(terms)
+		const container = getCallingNotesContainer()
+		assert.ok(container.textContent.includes('robins go in first'))
+		assert.ok(container.textContent.includes('larks follow'))
+	})
+
+	it('replaces ladies/gents with role terms', () => {
+		replaceCallingNotes(terms)
+		const container = getCallingNotesContainer()
+		assert.ok(container.textContent.includes('robin leads the lark'))
+	})
+
+	it('replaces "opposite gendered" with "opposite role"', () => {
+		replaceCallingNotes(terms)
+		const container = getCallingNotesContainer()
+		assert.ok(container.textContent.includes('opposite role neighbor'))
+		assert.ok(!container.textContent.includes('opposite gendered'))
+	})
+
+	it('replaces "same gendered" with "same role"', () => {
+		replaceCallingNotes(terms)
+		const container = getCallingNotesContainer()
+		assert.ok(container.textContent.includes('same role neighbor'))
+		assert.ok(!container.textContent.includes('same gendered'))
+	})
+
+	it('replaces "same gender" (without -ed) with "same role"', () => {
+		replaceCallingNotes(terms)
+		const container = getCallingNotesContainer()
+		assert.ok(container.textContent.includes('Same role pairs face across'))
+	})
+
+	it('replaces "opposite gender" (without -ed) with "opposite role"', () => {
+		replaceCallingNotes(terms)
+		const container = getCallingNotesContainer()
+		assert.ok(container.textContent.includes('Opposite role pairs face along'))
+	})
+
+	it('does nothing when terms has no ROLE_L key', () => {
+		replaceCallingNotes(new Map())
+		const container = getCallingNotesContainer()
+		assert.ok(container.textContent.includes('women'))
+		assert.ok(container.textContent.includes('opposite gendered'))
+	})
+
+	it('does nothing when there is no Calling Notes section', () => {
+		setupDOM('<!DOCTYPE html><html><body></body></html>')
+		// Should not throw
+		replaceCallingNotes(terms)
+	})
+})
+
 // ── getVariantVideosCell ─────────────────────────────────────────────────
 
 describe('getVariantVideosCell', () => {
@@ -442,6 +562,10 @@ describe('replaceAll', () => {
 				<td>A2: Men allemande left 3/4</td>
 			</tr>
 			</table>
+			<div class="box">
+				<h2>Calling Notes:</h2>
+				The women go first. Opposite gendered neighbors swap.
+			</div>
 		</body></html>`)
 	})
 
@@ -471,6 +595,9 @@ describe('replaceAll', () => {
 			getVariantVideosCell().textContent,
 			'A2: Larks allemande left 3/4'
 		)
+		const callingNotes = getCallingNotesContainer()
+		assert.ok(callingNotes.textContent.includes('robins go first'))
+		assert.ok(callingNotes.textContent.includes('Opposite role neighbors'))
 	})
 
 	it('replaces all terms with lead/follow options', () => {
