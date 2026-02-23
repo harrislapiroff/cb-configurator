@@ -6,3 +6,4 @@ Thumbs.db
 node_modules/
 safari/
 web-ext-artifacts/
+.env
