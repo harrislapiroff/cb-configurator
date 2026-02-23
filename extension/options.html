@@ -30,11 +30,21 @@
 				border-color: rgba(255,255,255,0.25)
 			}
 		}
+		#permissions-banner p {
+			margin: 0 0 0.5em;
+		}
+		#permissions-banner button {
+			cursor: pointer;
+		}
 	</style>
 </head>
 <body>
 	<div class="container">
 		<h1>Caller's Box Configurator</h1>
+		<section class="form-row" id="permissions-banner" hidden>
+			<p>This extension needs access to the Caller's Box website to work.</p>
+			<button id="grant-access">Grant Website Access</button>
+		</section>
 		<cb-options-form>
 			<form>
 				<section class="form-row">

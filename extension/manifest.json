@@ -38,5 +38,6 @@
 			"matches": ["*://*.ibiblio.org/*"]
 		}
 	],
-	"permissions": ["storage"]
+	"permissions": ["storage"],
+	"optional_host_permissions": ["*://*.ibiblio.org/*"]
 }
