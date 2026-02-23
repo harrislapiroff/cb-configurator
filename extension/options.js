@@ -10,7 +10,10 @@ class OptionsForm extends HTMLElement {
 	connectedCallback() {
 		this.form = this.querySelector('form')
 		this.restoreOptions()
-		this.form.addEventListener('input', this.saveOptions.bind(this))
+		this.form.addEventListener('input', () => {
+			this.saveOptions()
+			this.updateEnabledState()
+		})
 	}
 
 	async restoreOptions() {
@@ -25,6 +28,13 @@ class OptionsForm extends HTMLElement {
 				el.value = value
 			}
 		})
+		this.updateEnabledState()
+	}
+
+	updateEnabledState() {
+		const enabled = this.form.querySelector('[name=enabled]').checked
+		this.form.querySelector('[name=useRSR]').disabled = !enabled
+		this.form.querySelector('[name=roleTerms]').disabled = !enabled
 	}
 
 	async saveOptions() {

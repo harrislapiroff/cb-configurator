@@ -15,6 +15,9 @@
 			margin: 0;
 			padding: 0;
 		}
+		.container {
+			min-width: 300px;
+		}
 		h1 {
 			font-size: inherit;
 			font-weight: bold;
@@ -30,11 +33,12 @@
 				border-color: rgba(255,255,255,0.25)
 			}
 		}
-		/* Toggle switches */
+		/* Toggle switches — label on left, toggle on right (macOS style) */
 		.form-row label:has(input[type="checkbox"]) {
 			display: flex;
 			align-items: center;
-			gap: 0.75ch;
+			justify-content: space-between;
+			gap: 1ch;
 			cursor: pointer;
 		}
 		input[type="checkbox"] {
@@ -51,6 +55,7 @@
 			position: relative;
 			transition: background 0.25s ease;
 			flex-shrink: 0;
+			order: 1;
 		}
 		.toggle-track::before {
 			content: "";
@@ -73,6 +78,20 @@
 		input[type="checkbox"]:focus-visible + .toggle-track {
 			outline: 2px solid -webkit-focus-ring-color;
 			outline-offset: 2px;
+		}
+		/* Select row */
+		.form-row:has(select) {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 1ch;
+		}
+		/* Disabled state — dim options when extension is off */
+		.form-row:has(:disabled) {
+			opacity: 0.4;
+		}
+		.form-row:has(:disabled) label {
+			cursor: default;
 		}
 		/* Permissions banner */
 		#permissions-banner p {
