@@ -41,21 +41,27 @@ customElements.define('cb-options-form', OptionsForm)
 
 // Permission check — Safari (and some MV3 browsers) require explicit user
 // grants for content script host access. Show a banner when not yet granted.
-const REQUIRED_ORIGINS = ['*://*.ibiblio.org/*']
+//
+// Check the exact pattern from content_scripts.matches so that Chrome (which
+// implicitly grants it) returns true and avoids showing the banner needlessly.
+// Request the broader pattern declared in optional_host_permissions.
+const CONTENT_SCRIPT_ORIGINS = ['*://*.ibiblio.org/contradance/thecallersbox/dance.php?id=*']
+const REQUEST_ORIGINS = ['*://*.ibiblio.org/*']
 const permissionsBanner = document.getElementById('permissions-banner')
 const grantAccessBtn = document.getElementById('grant-access')
 
 if (permissionsBanner && grantAccessBtn) {
-	browser.permissions.contains({ origins: REQUIRED_ORIGINS })
+	browser.permissions.contains({ origins: CONTENT_SCRIPT_ORIGINS })
 		.then(granted => { permissionsBanner.hidden = granted })
 		.catch(() => { permissionsBanner.hidden = true })
 
 	// Call permissions.request() synchronously in the click handler —
 	// an async gap before this call would lose the user-gesture context.
 	grantAccessBtn.addEventListener('click', () => {
-		browser.permissions.request({ origins: REQUIRED_ORIGINS })
+		browser.permissions.request({ origins: REQUEST_ORIGINS })
 			.then(granted => {
 				if (granted) permissionsBanner.hidden = true
 			})
+			.catch(() => {})
 	})
 }
