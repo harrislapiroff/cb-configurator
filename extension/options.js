@@ -60,7 +60,18 @@ if (permissionsBanner && grantAccessBtn) {
 	grantAccessBtn.addEventListener('click', () => {
 		browser.permissions.request({ origins: REQUEST_ORIGINS })
 			.then(granted => {
-				if (granted) permissionsBanner.hidden = true
+				if (granted) {
+					permissionsBanner.hidden = true
+					// Reload the active tab so the content script runs
+					// on the already-loaded page.
+					if (browser.tabs) {
+						browser.tabs.query({ active: true, currentWindow: true })
+							.then(tabs => {
+								if (tabs[0]) browser.tabs.reload(tabs[0].id)
+							})
+							.catch(() => {})
+					}
+				}
 			})
 			.catch(() => {})
 	})
