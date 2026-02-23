@@ -225,6 +225,72 @@ Apple's review for Safari extensions typically asks for a written explanation of
 what the extension does and why it requests each permission — prepare a brief
 reviewer note.
 
+### Automated publishing (GitHub Actions)
+
+The `publish.yml` workflow automatically submits the extension to Chrome,
+Firefox, and Edge whenever a GitHub release is published. It uses
+[publish-browser-extension](https://github.com/aklinker1/publish-browser-extension)
+to handle uploads to all three stores.
+
+**How it works:**
+
+1. Creating a GitHub release triggers the workflow
+2. Lint and tests run first — publishing is blocked if they fail
+3. `web-ext build` produces the `.zip`
+4. The zip is submitted to every store whose secrets are configured; stores
+   without credentials are silently skipped
+
+**Required GitHub Actions secrets:**
+
+Configure these in **Settings → Secrets and variables → Actions** on the
+repository. Only set secrets for stores you want to publish to — unconfigured
+stores are skipped automatically.
+
+| Store | Secret | Description |
+|-------|--------|-------------|
+| Chrome | `CHROME_EXTENSION_ID` | Extension ID from the Chrome Web Store dashboard |
+| Chrome | `CHROME_CLIENT_ID` | OAuth 2.0 client ID from Google Cloud Console |
+| Chrome | `CHROME_CLIENT_SECRET` | OAuth 2.0 client secret |
+| Chrome | `CHROME_REFRESH_TOKEN` | OAuth 2.0 refresh token (see setup below) |
+| Firefox | `FIREFOX_EXTENSION_ID` | Add-on ID (e.g. `callersboxconfigurator@chromamine.com`) |
+| Firefox | `FIREFOX_JWT_ISSUER` | API key (issuer) from AMO Developer Hub |
+| Firefox | `FIREFOX_JWT_SECRET` | API secret from AMO Developer Hub |
+| Edge | `EDGE_PRODUCT_ID` | Product ID from Partner Center |
+| Edge | `EDGE_CLIENT_ID` | API client ID from Partner Center |
+| Edge | `EDGE_API_KEY` | API client secret from Partner Center |
+
+**Initial setup per store:**
+
+Each store requires a one-time manual first submission before automated updates
+will work. After the first submission, the workflow handles subsequent versions.
+
+- **Chrome:** Create a Google Cloud project, enable the Chrome Web Store API,
+  create an OAuth 2.0 Desktop client, and exchange an authorization code for a
+  refresh token. See the
+  [Chrome Web Store API docs](https://developer.chrome.com/docs/webstore/using-api).
+- **Firefox:** Generate API credentials at
+  <https://addons.mozilla.org/en-US/developers/addon/api/key/>. Listed
+  extensions enter a review queue after upload — this is expected and not a
+  failure.
+- **Edge:** Generate API credentials under "Publish API" in
+  [Partner Center](https://partner.microsoft.com/dashboard/microsoftedge/overview).
+  Credentials expire after 2 years.
+
+**Creating a release:**
+
+```sh
+# 1. Update version in manifest.json and package.json
+# 2. Commit, tag, and push
+git tag v0.3
+git push origin main --tags
+# 3. Create a GitHub release for the tag (via UI or gh CLI)
+gh release create v0.3 --generate-notes
+```
+
+Safari is not included in the automated workflow because it requires macOS
+runners and Apple code signing. Continue using the manual process described
+above for Safari submissions.
+
 ### Other browsers
 
 - **Brave**: Uses the Chrome Web Store directly — install the Chrome version,
