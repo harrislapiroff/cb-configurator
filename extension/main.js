@@ -42,6 +42,12 @@ export const replaceTerm = (termMap) => (key) => (el) => el.textContent = termMa
 export const replaceRoles = (terms) => {
 	if (!terms.has('ROLE_R')) return
 
+	// Note: replaceRoleTextInPhrases also substitutes "men"/"women" text
+	// within #phrases via word-boundary regex, so there is some overlap here
+	// for glossary links that sit inside #phrases. replaceRoles is kept because
+	// it covers the whole document (links outside #phrases) and works by
+	// selector rather than text content, making it more robust to unusual link
+	// text that word-boundary matching would miss.
 	const term = replaceTerm(terms)
 	document.querySelectorAll('a[href$="#men"]')
 		.forEach(term('ROLE_L'))
@@ -126,15 +132,27 @@ export const replaceMicroNotationFormation = (terms) => {
 
 }
 
+// Apply the capitalization style of `original` to `replacement`.
+// Handles three cases: ALL CAPS ("MEN" → "LARKS"), Title case ("Men" → "Larks"),
+// and all-lowercase ("men" → "larks").
+export const matchCapitalization = (original, replacement) => {
+	if (original === original.toUpperCase()) return replacement.toUpperCase()
+	if (original[0] === original[0].toUpperCase()) {
+		return replacement[0].toUpperCase() + replacement.slice(1)
+	}
+	return replacement.toLowerCase()
+}
+
 // Replace plain-text occurrences of man/woman/men/women in a list of text nodes.
-// Uses word boundaries so "promenade" is not affected.
+// Uses word boundaries so "promenade" is not affected, and preserves the
+// capitalization style of each matched word.
 const replaceGenderedWordsInNodes = (nodes, terms) => {
 	nodes.forEach(node => {
 		node.textContent = node.textContent
-			.replace(/\bwomen\b/gi, terms.get('ROLE_R'))
-			.replace(/\bwoman\b/gi, terms.get('ROLE_R_S'))
-			.replace(/\bmen\b/gi, terms.get('ROLE_L'))
-			.replace(/\bman\b/gi, terms.get('ROLE_L_S'))
+			.replace(/\bwomen\b/gi, (m) => matchCapitalization(m, terms.get('ROLE_R')))
+			.replace(/\bwoman\b/gi, (m) => matchCapitalization(m, terms.get('ROLE_R_S')))
+			.replace(/\bmen\b/gi, (m) => matchCapitalization(m, terms.get('ROLE_L')))
+			.replace(/\bman\b/gi, (m) => matchCapitalization(m, terms.get('ROLE_L_S')))
 	})
 }
 

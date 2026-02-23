@@ -14,6 +14,7 @@ import {
 	getDescendentTextNodes,
 	getFormationCell,
 	getVariantVideosCell,
+	matchCapitalization,
 } from '../extension/main.js'
 import {
 	HALF_GYP_TERMS,
@@ -53,6 +54,27 @@ describe('buildTerms', () => {
 	it('includes no role terms when roleTerms is "mw"', () => {
 		const terms = buildTerms({ useRSR: false, roleTerms: 'mw' })
 		assert.equal(terms.has('ROLE_R'), false)
+	})
+})
+
+// ── matchCapitalization ──────────────────────────────────────────────────
+
+describe('matchCapitalization', () => {
+	it('returns replacement ALL CAPS when original is ALL CAPS', () => {
+		assert.equal(matchCapitalization('MEN', 'Larks'), 'LARKS')
+		assert.equal(matchCapitalization('WOMEN', 'Robins'), 'ROBINS')
+	})
+
+	it('returns replacement with leading capital when original is title case', () => {
+		assert.equal(matchCapitalization('Men', 'Larks'), 'Larks')
+		assert.equal(matchCapitalization('Man', 'Lark'), 'Lark')
+	})
+
+	it('returns replacement lowercase when original is all lowercase', () => {
+		assert.equal(matchCapitalization('men', 'Larks'), 'larks')
+		assert.equal(matchCapitalization('man', 'Lark'), 'lark')
+		assert.equal(matchCapitalization('women', 'Robins'), 'robins')
+		assert.equal(matchCapitalization('woman', 'Robin'), 'robin')
 	})
 })
 
@@ -257,17 +279,28 @@ describe('replaceRoleTextInPhrases', () => {
 		</body></html>`)
 	})
 
-	it('replaces singular man/woman with Lark/Robin', () => {
+	it('replaces singular man/woman with Lark/Robin, preserving capitalization', () => {
 		replaceRoleTextInPhrases(terms)
 		const paras = document.querySelectorAll('#phrases p')
+		// "Man"/"Woman" (title case) → "Lark"/"Robin"; "man"/"woman" (lowercase) → "lark"/"robin"
 		assert.equal(paras[0].textContent, 'Lark one right hand high || Lark two turn alone')
-		assert.equal(paras[1].textContent, 'Robin one and Lark two arch, Lark one and Robin two dive')
+		assert.equal(paras[1].textContent, 'Robin one and lark two arch, lark one and robin two dive')
 	})
 
-	it('replaces plural men/women with Larks/Robins', () => {
+	it('replaces plural men/women with Larks/Robins, preserving capitalization', () => {
 		replaceRoleTextInPhrases(terms)
 		const paras = document.querySelectorAll('#phrases p')
-		assert.equal(paras[2].textContent, 'Larks walk forward; Robins balance')
+		// "men"/"women" (all lowercase) → "larks"/"robins"
+		assert.equal(paras[2].textContent, 'larks walk forward; robins balance')
+	})
+
+	it('replaces ALL CAPS MEN/WOMEN with ALL CAPS replacement', () => {
+		setupDOM(`<!DOCTYPE html><html><body>
+			<div id="phrases"><p>MEN on the left, WOMEN on the right</p></div>
+		</body></html>`)
+		replaceRoleTextInPhrases(terms)
+		const para = document.querySelector('#phrases p')
+		assert.equal(para.textContent, 'LARKS on the left, ROBINS on the right')
 	})
 
 	it('does not replace substrings (e.g. promenade)', () => {
@@ -276,7 +309,7 @@ describe('replaceRoleTextInPhrases', () => {
 		</body></html>`)
 		replaceRoleTextInPhrases(terms)
 		const para = document.querySelector('#phrases p')
-		assert.equal(para.textContent, 'promenade; cement Larks')
+		assert.equal(para.textContent, 'promenade; cement larks')
 	})
 
 	it('does nothing when terms has no ROLE_L key', () => {
@@ -432,7 +465,7 @@ describe('replaceAll', () => {
 		)
 		assert.equal(
 			document.querySelector('#phrases p').textContent,
-			'Lark one arch; Robin two dive'
+			'Lark one arch; robin two dive'
 		)
 		assert.equal(
 			getVariantVideosCell().textContent,
