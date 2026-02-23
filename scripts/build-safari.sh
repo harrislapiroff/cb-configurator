@@ -17,10 +17,13 @@ xcrun safari-web-extension-packager extension/ \
 	--bundle-identifier com.chromamine.callersboxconfigurator \
 	--swift --no-open --no-prompt --force
 
-# Fix HTML entity escaping introduced by the packager.
-# Search all text files (skipping binaries via grep -I) rather than
-# hard-coding extensions, so we catch .pbxproj, .xcstrings, etc.
-find safari/ -type f -exec grep -lI '&apos;' {} + 2>/dev/null \
+# Fix &apos; entity escaping the packager introduces into Xcode project
+# metadata when the app name contains an apostrophe.  Target only project
+# files where the entity is wrong — leave extension source (HTML/JS/CSS)
+# untouched so legitimate entities aren't corrupted.
+find safari/ -type f \
+	\( -name '*.pbxproj' -o -name '*.plist' -o -name '*.xcstrings' -o -name '*.swift' \) \
+	-exec grep -l '&apos;' {} + 2>/dev/null \
 	| while IFS= read -r f; do sed -i '' "s/&apos;/'/g" "$f"; done \
 	|| true
 
