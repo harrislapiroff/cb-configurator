@@ -17,11 +17,11 @@ xcrun safari-web-extension-packager extension/ \
 	--bundle-identifier com.chromamine.callersboxconfigurator \
 	--swift --no-open --no-prompt --force
 
-# Fix HTML entity escaping introduced by the packager
-find safari/ -type f \( \
-	-name '*.swift' -o -name '*.html' -o -name '*.plist' \
-	-o -name '*.storyboard' -o -name '*.xib' -o -name '*.strings' \
-\) -exec sed -i '' "s/&apos;/'/g" {} +
+# Fix HTML entity escaping introduced by the packager.
+# Search all text files (skipping binaries via grep -I) rather than
+# hard-coding extensions, so we catch .pbxproj, .xcstrings, etc.
+find safari/ -type f -exec grep -lI '&apos;' {} + 2>/dev/null \
+	| while IFS= read -r f; do sed -i '' "s/&apos;/'/g" "$f"; done
 
 # Patch in signing team if configured
 if [ -n "${DEVELOPMENT_TEAM:-}" ]; then
