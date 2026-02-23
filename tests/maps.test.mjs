@@ -32,6 +32,11 @@ describe('ROLE_TERMS_BIRDS', () => {
 		assert.equal(ROLE_TERMS_BIRDS.get('ROLE_L'), 'Larks')
 	})
 
+	it('has singular role terms for plain-text replacements', () => {
+		assert.equal(ROLE_TERMS_BIRDS.get('ROLE_R_S'), 'Robin')
+		assert.equal(ROLE_TERMS_BIRDS.get('ROLE_L_S'), 'Lark')
+	})
+
 	it('has all chain variants', () => {
 		assert.equal(ROLE_TERMS_BIRDS.get('CHAIN_R'), 'Robins chain')
 		assert.equal(ROLE_TERMS_BIRDS.get('CHAIN_L'), 'Larks chain')
@@ -53,6 +58,11 @@ describe('ROLE_TERMS_LF', () => {
 	it('replaces gendered role terms with Leads/Follows', () => {
 		assert.equal(ROLE_TERMS_LF.get('ROLE_R'), 'Follows')
 		assert.equal(ROLE_TERMS_LF.get('ROLE_L'), 'Leads')
+	})
+
+	it('has singular role terms for plain-text replacements', () => {
+		assert.equal(ROLE_TERMS_LF.get('ROLE_R_S'), 'Follow')
+		assert.equal(ROLE_TERMS_LF.get('ROLE_L_S'), 'Lead')
 	})
 
 	it('has the same keys as ROLE_TERMS_BIRDS', () => {

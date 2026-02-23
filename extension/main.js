@@ -42,6 +42,12 @@ export const replaceTerm = (termMap) => (key) => (el) => el.textContent = termMa
 export const replaceRoles = (terms) => {
 	if (!terms.has('ROLE_R')) return
 
+	// Note: replaceRoleTextInPhrases also substitutes "men"/"women" text
+	// within #phrases via word-boundary regex, so there is some overlap here
+	// for glossary links that sit inside #phrases. replaceRoles is kept because
+	// it covers the whole document (links outside #phrases) and works by
+	// selector rather than text content, making it more robust to unusual link
+	// text that word-boundary matching would miss.
 	const term = replaceTerm(terms)
 	document.querySelectorAll('a[href$="#men"]')
 		.forEach(term('ROLE_L'))
@@ -126,6 +132,61 @@ export const replaceMicroNotationFormation = (terms) => {
 
 }
 
+// Apply the capitalization style of `original` to `replacement`.
+// Handles three cases: ALL CAPS ("MEN" → "LARKS"), Title case ("Men" → "Larks"),
+// and all-lowercase ("men" → "larks").
+export const matchCapitalization = (original, replacement) => {
+	if (original === original.toUpperCase()) return replacement.toUpperCase()
+	if (original[0] === original[0].toUpperCase()) {
+		return replacement[0].toUpperCase() + replacement.slice(1)
+	}
+	return replacement.toLowerCase()
+}
+
+// Replace plain-text occurrences of man/woman/men/women in a list of text nodes.
+// Uses word boundaries so "promenade" is not affected, and preserves the
+// capitalization style of each matched word.
+const replaceGenderedWordsInNodes = (nodes, terms) => {
+	nodes.forEach(node => {
+		node.textContent = node.textContent
+			.replace(/\bwomen\b/gi, (m) => matchCapitalization(m, terms.get('ROLE_R')))
+			.replace(/\bwoman\b/gi, (m) => matchCapitalization(m, terms.get('ROLE_R_S')))
+			.replace(/\bmen\b/gi, (m) => matchCapitalization(m, terms.get('ROLE_L')))
+			.replace(/\bman\b/gi, (m) => matchCapitalization(m, terms.get('ROLE_L_S')))
+	})
+}
+
+export const replaceRoleTextInPhrases = (terms) => {
+	if (!terms.has('ROLE_L')) return
+
+	// Some dances refer to specific dancers by name in plain text rather than
+	// glossary links, e.g. "Man one right hand high || Man two turn alone" or
+	// "Woman one and man two arch." These aren't wrapped in #men/#women links,
+	// so we walk all text nodes in #phrases and do word-boundary replacements.
+	const phrasesEl = document.getElementById('phrases')
+	if (!phrasesEl) return
+	const textNodes = getDescendentTextNodes(phrasesEl)
+	replaceGenderedWordsInNodes(textNodes, terms)
+}
+
+export const getVariantVideosCell = () => {
+	return Array.from(document.querySelectorAll('td'))
+		.find(cell => cell.textContent.includes('VariantVideos'))
+		?.nextElementSibling
+}
+
+export const replaceVariantVideos = (terms) => {
+	if (!terms.has('ROLE_L')) return
+
+	// The VariantVideos field contains plain-text descriptions of dance
+	// variations, e.g. "A2: Men allemande left 3/4; neighbor swing."
+	// These are not glossary links so we use word-boundary text replacement.
+	const cell = getVariantVideosCell()
+	if (!cell) return
+	const textNodes = getDescendentTextNodes(cell)
+	replaceGenderedWordsInNodes(textNodes, terms)
+}
+
 export const buildTerms = (options) => {
 	const termMaps = []
 	if (options.useRSR) termMaps.push(HALF_GYP_TERMS)
@@ -143,6 +204,8 @@ export const replaceAll = (options) => {
 	replaceDoubleGyp(terms)
 	replaceMicroNotationChoreo(terms)
 	replaceMicroNotationFormation(terms)
+	replaceRoleTextInPhrases(terms)
+	replaceVariantVideos(terms)
 }
 
 // Instantiation (only runs in extension context):
@@ -159,11 +222,14 @@ const init = async () => {
 	const formationValueCellHTML = Array.from(document.querySelectorAll('td'))
 		.find(cell => cell.textContent.includes('FormationDetail'))
 		?.nextElementSibling?.innerHTML
+	const variantVideosCellHTML = getVariantVideosCell()?.innerHTML
 
 	const revert = () => {
 		document.getElementById('phrases').innerHTML = phrasesTableHTML
 		const formationCell = getFormationCell()
 		if (formationCell) formationCell.innerHTML = formationValueCellHTML
+		const variantVideosCell = getVariantVideosCell()
+		if (variantVideosCell) variantVideosCell.innerHTML = variantVideosCellHTML
 	}
 
 	// When options change, rerender
