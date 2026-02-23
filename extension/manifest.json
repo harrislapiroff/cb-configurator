@@ -10,7 +10,7 @@
 	},
 	"content_scripts": [
 		{
-			"matches": ["*://*.ibiblio.org/contradance/thecallersbox/dance.php?id=*"],
+			"matches": ["*://*.ibiblio.org/contradance/thecallersbox/*"],
 			"js": ["content-script.js"],
 			"run_at": "document_end"
 		}

@@ -45,7 +45,7 @@ customElements.define('cb-options-form', OptionsForm)
 // Check the exact pattern from content_scripts.matches so that Chrome (which
 // implicitly grants it) returns true and avoids showing the banner needlessly.
 // Request the broader pattern declared in optional_host_permissions.
-const CONTENT_SCRIPT_ORIGINS = ['*://*.ibiblio.org/contradance/thecallersbox/dance.php?id=*']
+const CONTENT_SCRIPT_ORIGINS = ['*://*.ibiblio.org/contradance/thecallersbox/*']
 const REQUEST_ORIGINS = ['*://*.ibiblio.org/*']
 const permissionsBanner = document.getElementById('permissions-banner')
 const grantAccessBtn = document.getElementById('grant-access')
