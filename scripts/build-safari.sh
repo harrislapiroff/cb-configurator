@@ -21,7 +21,8 @@ xcrun safari-web-extension-packager extension/ \
 # Search all text files (skipping binaries via grep -I) rather than
 # hard-coding extensions, so we catch .pbxproj, .xcstrings, etc.
 find safari/ -type f -exec grep -lI '&apos;' {} + 2>/dev/null \
-	| while IFS= read -r f; do sed -i '' "s/&apos;/'/g" "$f"; done
+	| while IFS= read -r f; do sed -i '' "s/&apos;/'/g" "$f"; done \
+	|| true
 
 # Patch in signing team if configured
 if [ -n "${DEVELOPMENT_TEAM:-}" ]; then
