@@ -1,0 +1,71 @@
+name: Publish
+
+on:
+  release:
+    types: [published]
+
+# Prevent concurrent publishes
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+
+  publish:
+    needs: lint-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+
+      - name: Publish to browser stores
+        run: |
+          ZIP=$(ls web-ext-artifacts/*.zip | head -1)
+          ARGS=""
+          if [ -n "$CHROME_EXTENSION_ID" ]; then
+            ARGS="$ARGS --chrome-zip $ZIP"
+            echo "Will publish to Chrome Web Store"
+          fi
+          if [ -n "$FIREFOX_EXTENSION_ID" ]; then
+            ARGS="$ARGS --firefox-zip $ZIP"
+            echo "Will publish to Firefox Add-ons"
+          fi
+          if [ -n "$EDGE_PRODUCT_ID" ]; then
+            ARGS="$ARGS --edge-zip $ZIP"
+            echo "Will publish to Edge Add-ons"
+          fi
+          if [ -z "$ARGS" ]; then
+            echo "::warning::No store credentials configured — skipping publish"
+            exit 0
+          fi
+          npx -y -p publish-browser-extension publish-extension $ARGS
+        env:
+          # Chrome Web Store
+          CHROME_EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
+          CHROME_CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
+          CHROME_CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
+          CHROME_REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
+          # Firefox Add-ons (AMO)
+          FIREFOX_EXTENSION_ID: ${{ secrets.FIREFOX_EXTENSION_ID }}
+          FIREFOX_JWT_ISSUER: ${{ secrets.FIREFOX_JWT_ISSUER }}
+          FIREFOX_JWT_SECRET: ${{ secrets.FIREFOX_JWT_SECRET }}
+          # Edge Add-ons
+          EDGE_PRODUCT_ID: ${{ secrets.EDGE_PRODUCT_ID }}
+          EDGE_CLIENT_ID: ${{ secrets.EDGE_CLIENT_ID }}
+          EDGE_API_KEY: ${{ secrets.EDGE_API_KEY }}
