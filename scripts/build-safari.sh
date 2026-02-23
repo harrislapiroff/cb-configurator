@@ -17,15 +17,12 @@ xcrun safari-web-extension-packager extension/ \
 	--bundle-identifier com.chromamine.callersboxconfigurator \
 	--swift --no-open --no-prompt --force
 
-# Fix &apos; entity escaping the packager introduces into Xcode project
-# metadata when the app name contains an apostrophe.  Target only project
-# files where the entity is wrong — leave extension source (HTML/JS/CSS)
-# untouched so legitimate entities aren't corrupted.
-find safari/ -type f \
-	\( -name '*.pbxproj' -o -name '*.plist' -o -name '*.xcstrings' -o -name '*.swift' \) \
-	-exec grep -l '&apos;' {} + 2>/dev/null \
-	| while IFS= read -r f; do sed -i '' "s/&apos;/'/g" "$f"; done \
-	|| true
+# The packager escapes the apostrophe in "Caller's Box Configurator" as
+# &apos; inside JS string literals assigned to .innerText in Script.js.
+# The browser renders the raw entity characters on screen instead of an
+# apostrophe, so fix it up.
+SCRIPT_JS="$PROJ_DIR/Shared (App)/Resources/Script.js"
+sed -i '' "s/&apos;/'/g" "$SCRIPT_JS"
 
 # Patch in signing team if configured
 if [ -n "${DEVELOPMENT_TEAM:-}" ]; then
