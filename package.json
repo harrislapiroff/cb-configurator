@@ -1,7 +1,7 @@
 {
 	"private": true,
 	"name": "cb-configurator",
-	"version": "0.2.0",
+	"version": "0.3.0",
 	"description": "Replaces gendered dance terminology on the Caller's Box website with gender-neutral alternatives.",
 	"scripts": {
 		"start": "web-ext run -s extension/",
