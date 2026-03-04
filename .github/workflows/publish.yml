@@ -3,6 +3,16 @@ name: Publish
 on:
   release:
     types: [published]
+  workflow_dispatch:
+    inputs:
+      store:
+        description: Store to publish to
+        required: true
+        type: choice
+        options:
+          - chrome
+          - firefox
+          - edge
 
 # Prevent concurrent publishes
 concurrency:
@@ -22,7 +32,7 @@ jobs:
       - run: npm run lint
       - run: npm test
 
-  publish:
+  build:
     needs: lint-and-test
     runs-on: ubuntu-latest
     steps:
@@ -33,39 +43,56 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: extension-zip
+          path: web-ext-artifacts/*.zip
 
-      - name: Publish to browser stores
-        run: |
-          ZIP=$(ls web-ext-artifacts/*.zip | head -1)
-          ARGS=""
-          if [ -n "$CHROME_EXTENSION_ID" ]; then
-            ARGS="$ARGS --chrome-zip $ZIP"
-            echo "Will publish to Chrome Web Store"
-          fi
-          if [ -n "$FIREFOX_EXTENSION_ID" ]; then
-            ARGS="$ARGS --firefox-zip $ZIP"
-            echo "Will publish to Firefox Add-ons"
-          fi
-          if [ -n "$EDGE_PRODUCT_ID" ]; then
-            ARGS="$ARGS --edge-zip $ZIP"
-            echo "Will publish to Edge Add-ons"
-          fi
-          if [ -z "$ARGS" ]; then
-            echo "::warning::No store credentials configured — skipping publish"
-            exit 0
-          fi
-          npx -y -p publish-browser-extension publish-extension $ARGS
+  publish-chrome:
+    needs: build
+    if: github.event_name == 'release' || inputs.store == 'chrome'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: extension-zip
+          path: web-ext-artifacts
+      - name: Publish to Chrome Web Store
+        run: npx -y -p publish-browser-extension publish-extension --chrome-zip $(ls web-ext-artifacts/*.zip | head -1)
         env:
-          # Chrome Web Store
           CHROME_EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
           CHROME_CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
           CHROME_CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
           CHROME_REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
-          # Firefox Add-ons (AMO)
+
+  publish-firefox:
+    needs: build
+    if: github.event_name == 'release' || inputs.store == 'firefox'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: extension-zip
+          path: web-ext-artifacts
+      - name: Publish to Firefox Add-ons
+        run: npx -y -p publish-browser-extension publish-extension --firefox-zip $(ls web-ext-artifacts/*.zip | head -1)
+        env:
           FIREFOX_EXTENSION_ID: ${{ secrets.FIREFOX_EXTENSION_ID }}
           FIREFOX_JWT_ISSUER: ${{ secrets.FIREFOX_JWT_ISSUER }}
           FIREFOX_JWT_SECRET: ${{ secrets.FIREFOX_JWT_SECRET }}
-          # Edge Add-ons
+
+  publish-edge:
+    needs: build
+    if: github.event_name == 'release' || inputs.store == 'edge'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: extension-zip
+          path: web-ext-artifacts
+      - name: Publish to Edge Add-ons
+        run: npx -y -p publish-browser-extension publish-extension --edge-zip $(ls web-ext-artifacts/*.zip | head -1)
+        env:
           EDGE_PRODUCT_ID: ${{ secrets.EDGE_PRODUCT_ID }}
           EDGE_CLIENT_ID: ${{ secrets.EDGE_CLIENT_ID }}
           EDGE_API_KEY: ${{ secrets.EDGE_API_KEY }}
