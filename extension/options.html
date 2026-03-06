@@ -15,6 +15,9 @@
 			margin: 0;
 			padding: 0;
 		}
+		.container {
+			min-width: 300px;
+		}
 		h1 {
 			font-size: inherit;
 			font-weight: bold;
@@ -30,22 +33,109 @@
 				border-color: rgba(255,255,255,0.25)
 			}
 		}
+		/* Toggle switches — label on left, toggle on right (macOS style) */
+		.form-row label:has(input[type="checkbox"]) {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 1ch;
+			cursor: pointer;
+		}
+		input[type="checkbox"] {
+			position: absolute;
+			opacity: 0;
+			pointer-events: none;
+		}
+		.toggle-track {
+			display: inline-block;
+			width: 34px;
+			height: 20px;
+			background: rgba(120, 120, 128, 0.32);
+			border-radius: 11px;
+			position: relative;
+			transition: background 0.25s ease;
+			flex-shrink: 0;
+			order: 1;
+		}
+		.toggle-track::before {
+			content: "";
+			position: absolute;
+			width: 16px;
+			height: 16px;
+			border-radius: 50%;
+			background: white;
+			top: 2px;
+			left: 2px;
+			transition: transform 0.25s ease;
+			box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+		}
+		input[type="checkbox"]:checked + .toggle-track {
+			background: #34c759;
+		}
+		input[type="checkbox"]:checked + .toggle-track::before {
+			transform: translateX(14px);
+		}
+		input[type="checkbox"]:focus-visible + .toggle-track {
+			outline: 2px solid -webkit-focus-ring-color;
+			outline-offset: 2px;
+		}
+		/* Select row */
+		.form-row:has(select) {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 1ch;
+		}
+		/* Disabled state — dim options when extension is off */
+		.form-row:has(:disabled) {
+			opacity: 0.4;
+		}
+		.form-row:has(:disabled) label {
+			cursor: default;
+		}
+		/* Permissions banner */
+		#permissions-banner p {
+			margin: 0 0 0.5em;
+		}
+		#permissions-banner button {
+			cursor: pointer;
+			-webkit-appearance: none;
+			appearance: none;
+			background: #007aff;
+			color: white;
+			border: none;
+			border-radius: 6px;
+			padding: 0.4em 1em;
+			font-size: inherit;
+			font-family: inherit;
+		}
+		#permissions-banner button:active {
+			opacity: 0.7;
+		}
 	</style>
 </head>
 <body>
 	<div class="container">
 		<h1>Caller's Box Configurator</h1>
+		<section class="form-row" id="permissions-banner" hidden>
+			<p>This extension needs access to the Caller's Box website to work.</p>
+			<button id="grant-access">Grant Website Access</button>
+		</section>
 		<cb-options-form>
 			<form>
 				<section class="form-row">
 					<label>
-						<input type="checkbox" name="enabled"> Enabled
+						<input type="checkbox" name="enabled">
+						<span class="toggle-track"></span>
+						Enabled
 					</label>
 				</section>
 
 				<section class="form-row">
 					<label title="Replace “double gyp” with “quick trades”">
-						<input type="checkbox" name="useRSR"> Replace “double gyp” with “quick trades”
+						<input type="checkbox" name="useRSR">
+						<span class="toggle-track"></span>
+						Replace “double gyp” with “quick trades”
 					</label>
 				</section>
 

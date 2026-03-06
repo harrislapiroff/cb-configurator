@@ -6,4 +6,5 @@ Thumbs.db
 node_modules/
 safari/
 web-ext-artifacts/
+.env
 .claude/settings.local.json
